@@ -1,0 +1,140 @@
+---
+title: "Automatically Publish Quarto Slides\nwith GitHub Actions"
+author: "Rose Hartman"
+institute: "Arcus Education\nChildren's Hospital of Philadelphia, DBHi"
+date: "2024-06-13"
+---
+
+## What we're covering today
+
+::: {.incremental}
+
+* Very brief intro to Quarto
+* Slightly longer intro to GitHub Actions
+* Walk through an example of how to set up a repository to publish slides automatically!
+* Some resources for you to explore on your own
+* NOT covering how to create a GitHub repository or how to use git
+
+:::
+
+::: notes
+
+This is a brief talk, so I'm going to skip past a lot of the basics in the interest of time.
+In particular, I'm going to assume you already use git for version control, and are familiar with terms like "commit", "push", and "branch" as they relate to git and GitHub. 
+If you're new to git, GitHub, or both, this talk probably won't make a ton of sense for you today, but keep an eye out for the resources at the end and you can bookmark these slides to come back to at a later date. Welcome to the wonderful world of git. 
+
+::: 
+
+# What is Quarto?
+
+::: notes
+
+I'm assuming most of the people listening to this talk have at least heard of Quarto, but to make sure we're all on the same page: Quarto is an open source publishing system, like R Markdown, but with some excellent new functionality.
+One thing I particularly like quarto for is slides. This presentation is a quarto file, as a matter of fact!
+Quarto files are built for literate statistical programming, meaning you can have executable code blocks and bits of markdown text together in the same file. 
+Let's take a quick look at what a single slide in a quarto presentation might look like.
+
+:::
+
+## Quarto example
+
+```{r}
+#| message: false
+#| code-line-numbers: "|4|5|"
+library(tidyverse)
+msleep <- msleep |>
+  mutate(across(
+    where(is.character), 
+    as.factor))
+```
+
+::: notes
+
+The quarto format provides a lot of great functionality for including code in your presentations, such as line highlighting! 
+
+:::
+
+## And here's what that slide looks like
+
+````
+## Quarto example
+
+```{{r}}
+#| message: false
+#| code-line-numbers: "|4|5|"
+library(tidyverse)
+msleep <- msleep |>
+  mutate(across(
+    where(is.character), 
+    as.factor))
+```
+
+::: notes
+
+The quarto format provides a lot of great functionality for including 
+code in your presentations, such as line highlighting! 
+
+:::
+````
+
+::: notes
+
+You can see there's a header, "Quarto example", which gives the title of this slide.
+And then I have a block of R code, which runs when I render this presentation; this particular block doesn't produce any output, it just changes the msleep dataframe.
+There are some options I've specified for the code block, special comments starting with #|. 
+The first tells is to suppress messages, so I don't have the message info from loading the tidyverse printed on my slides; this is just like adding "message=FALSE" to a code block in RMarkdown. 
+The second, code-line-numbers, is quarto-specific. It's saying I'd like to highlight different lines in the code block sequentially, so I can draw my audience's attention to specific parts of my code. It starts with all lines, then just line 4, then just line 5, then all lines again. 
+And under the code block, you can see there's a little section marked "notes" -- that creates the speaker notes for my slides, what I'm reading right now!
+
+:::
+
+## Basic workflow create and publish Quarto slides
+
+::: notes
+
+::: 
+
+# What are GitHub Actions?
+
+::: notes
+
+::: 
+
+## Anatomy of a GH Action
+
+::: notes
+
+::: 
+
+## The workflow
+
+1. Make changes to your .qmd file(s), previewing as you work.
+2. When you're ready to commit, run `quarto render` in the command line (not R console).
+3. If you **do** want those changes published, commit to main. If you **don't** want them published, commit to a branch.
+4. As soon as you push changes to main in your GH repo, it triggers the quarto publish action!
+
+::: notes
+
+Your slides will always reflect the current version of your files on main -- there's no risk of you making updates but forgetting to publish them to quartopub.
+
+Note that this is especially handy for repos with multiple collaborators. If you're working on slide decks with someone who is new to quarto and/or doesn't have their own quartopub account set up, you can set it all up once for the whole team and no one has to think about it ever again.
+
+::: 
+
+## Freeze
+
+**Important**: We're not asking GitHub to actually execute all the R code (that would be very computationally expensive), so it's important that you use `quarto render` locally on your own computer after making any changes that could affect code output. 
+We have [freeze computations](https://quarto.org/docs/publishing/quarto-pub.html#freezing-computations) set up in `_quarto.yml`. 
+This means computations in R are done locally only, and the results are stored in `_freeze`. 
+That folder needs to be version controlled so it's available on github. 
+When you render, it will save the results of all the executed code in the `_freeze` directory. 
+When you commit and push the changes you made to your .qmd file, be sure to add any changes to the `_freeze` directory as well. 
+
+## {{< fa book-open >}} Keep learning
+
+* You actually didn't need to listen to this talk at all! You can just follow [the instructions for setting up GH actions on the quarto website](https://quarto.org/docs/publishing/quarto-pub.html#github-action).
+* To see a practical example, check out the [workshop series we ran using this workflow](https://arcus.github.io/r102/), including slides and recordings for four R workshops. Then poke around the GH repo to see how it's set up!
+* Read about how (and why) to [version control your writing](https://education.arcus.chop.edu/version-control-writing/).
+* Get started with [Quarto slide decks](https://quarto.org/docs/presentations/).
+* Get started with [GitHub Actions](https://docs.github.com/en/actions/quickstart).
+* New to version control? Check out the Arcus Education [intro to version control](https://liascript.github.io/course/?https://raw.githubusercontent.com/arcus/Arcus_Labs_Orientation/main/new_to_version_control.md#1), written with biomedical researchers and clinicians in mind.
