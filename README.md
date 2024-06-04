@@ -1,2 +1,3 @@
-# rmed_2024
-Slides and example repo for R/Med 2024 talk
+# Updating Quarto Slides Automatically with GitHub Actions
+
+Talk delivered at [R/Medicine 2024](https://rconsortium.github.io/RMedicine_website/) ([slides](https://rosemhartman.quarto.pub/rmed_2024.html#/title-slide)).
