@@ -1,7 +1,7 @@
 ---
-title: "Automatically Publish Quarto Slides\nwith GitHub Actions"
+title: "Automatically Publish Quarto Slides with GitHub Actions"
 author: "Rose Hartman"
-institute: "Arcus Education\nChildren's Hospital of Philadelphia, DBHi"
+institute: "Children's Hospital of Philadelphia, Arcus Education"
 date: "2024-06-13"
 ---
 
@@ -91,9 +91,12 @@ And under the code block, you can see there's a little section marked "notes" --
 
 ## Basic workflow to create and publish Quarto slides
 
-1. Make changes to your .qmd file(s), previewing with the Render button in RStudio as you work.
-2. When you're ready to publish, run `quarto render` in the command line (not R console) to convert your .qmd file(s) into the final format.
-3. Run `quarto publish` in the command line (not R console) to put your slides on QuartoPub, or wherever else you want to publish them.
+::: incremental
+
+* Make changes to your .qmd file(s), previewing with the Render button in RStudio to convert your .qmd file(s) into the final format.
+* Run `quarto publish` in the command line (not R console) to put your slides on QuartoPub, or wherever else you want to publish them (note that this also re-renders by default before publishing).
+
+:::
 
 ::: notes
 
@@ -123,11 +126,11 @@ Read the [GitHub Actions Quickstart Guide](https://docs.github.com/en/actions/qu
 
 <br>
 
-For a dive off the deep end, watch this talk about how data scientists can leverage GH Actions in a machine learning analysis workflow: [Machine learning operations with GitHub Actions and Kubernetes](https://www.youtube.com/watch?v=Ll50l3fsoYs)
+If you want a dive off the deep end, watch this talk about how data scientists leverage GH Actions in a machine learning analysis workflow: [Machine learning operations with GitHub Actions and Kubernetes](https://www.youtube.com/watch?v=Ll50l3fsoYs)
 
 ::: notes
 
-These are some links for you to come back to later if you want to learn more about GitHub Actions. 
+These are some links for you to come back to later if you want to learn more about GHA. 
 
 ::: 
 
@@ -155,51 +158,17 @@ The basic structure of a GH Action YAML file is to specify the trigger, which mi
 
 ::: 
 
-## A GHA to publish to QuartoPub
-
-```
-on:
-  workflow_dispatch:
-  push:
-    branches: main
-
-name: Quarto Publish
-
-jobs:
-  build-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4 
-
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
-
-      - name: Render and Publish 
-        uses: quarto-dev/quarto-actions/publish@v2
-        with:
-          target: quarto-pub
-          QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
-```
-
-::: notes
-
-Here's a look at what my GH Action YAML looks like for this repository. 
-The name of this action is Quarto Publish, and it's triggered whenever any contributor pushes changes to main, or it can be triggered manually (that's what workflow_dispatch means).
-Under jobs, you can see there are three distinct steps, and for each of them I'm just referencing an existing GH Action somewhere else. 
-The first step is "[Check out repository](https://github.com/actions/checkout)" which just gets a copy of the files in the repository ready to work with on the runner. 
-The second step is "[Set up Quarto](https://github.com/quarto-dev/quarto-actions/blob/main/setup)" which installs quarto on the runner. 
-The third step is "[Render and Publish](https://github.com/quarto-dev/quarto-actions/blob/main/publish)" which publishes my slides to quarto-pub (the target) using my quarto pub authorization token, which has to be stored in secrets for this job to be able to run.
-Under each job, the "uses" field points to the example workflow I'm using for each -- the first is just from the general GitHub examples, and the second two are published by the Quarto development team. 
-
-::: 
-
 ## The GHA + QuartoPub workflow
 
-1. Make changes to your .qmd file(s), previewing with the Render button in RStudio as you work.
-2. When you're ready to commit, run `quarto render` in the command line (not R console).
-3. If you **do** want those changes published, commit to main. If you **don't** want them published, commit to a branch.
-4. As soon as you push changes to main in your GH repo, it triggers the quarto publish action!
+::: incremental
+
+* Make changes to your .qmd file(s), previewing with the Render button in RStudio as you work.
+* When you're ready to commit, render again first with the Render button or run `quarto render` in the command line (not R console). 
+* If you **do** want those changes published, commit to main. If you **don't** want them published, commit to a branch.
+* As soon as you push changes to main in your GH repo, it triggers the quarto publish action!
+
+:::
+
 
 ::: notes
 
@@ -256,9 +225,18 @@ You don't create this file, it will be created automatically the first time you 
 Here's what `_publish.yml` looks like in this repo:
 
 ```
-put in yml
+- source: project
+  quarto-pub:
+    - id: a8d7fe1c-8a63-40cf-a107-999ae9475df3
+      url: 'https://rosemhartman.quarto.pub/rmed_2024'
 
 ```
+
+::: notes
+
+Crucially, you won't be able to get this file until you've run quarto publish once successfully on your own computer. That means your first time publishing this document can't be in a GHA; you have to publish it at least once the regular way, and then you can automate all your updates from then on.
+
+::: 
 
 ## `_freeze`
 
@@ -279,6 +257,48 @@ We're not asking GitHub to actually execute all the R code (that would be very c
 
 :::
 
+## `.github/workflows`
+
+(From [the Quarto docs instructions for using GHA](https://quarto.org/docs/publishing/quarto-pub.html#publish-action))
+
+```
+on:
+  workflow_dispatch:
+  push:
+    branches: main
+
+name: Quarto Publish
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4 
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render and Publish 
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          target: quarto-pub
+          QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
+```
+
+::: notes
+
+Here's a look at what my GH Action YAML looks like for this repository. 
+This has the same basic structure we talked about for GHA before: on, name, jobs.
+The name of this action is Quarto Publish, and it's triggered whenever any contributor pushes changes to main, or it can be triggered manually (that's what workflow_dispatch means).
+Under jobs, you can see there are three distinct steps, and for each of them I'm just referencing an existing GH Action somewhere else. 
+The first step is "[Check out repository](https://github.com/actions/checkout)" which just gets a copy of the files in the repository ready to work with on the runner. 
+The second step is "[Set up Quarto](https://github.com/quarto-dev/quarto-actions/blob/main/setup)" which installs quarto on the runner. 
+The third step is "[Render and Publish](https://github.com/quarto-dev/quarto-actions/blob/main/publish)" which publishes my slides to quarto-pub (the target) using my quarto pub authorization token, which has to be stored in secrets for this job to be able to run.
+Under each job, the "uses" field points to the example workflow I'm using for each -- the first is just from the general GitHub examples, and the second two are published by the Quarto development team. 
+
+::: 
+
 ## {{< fa book-open >}} Keep learning
 
 * You actually didn't need to listen to this talk at all! You can just follow [the instructions for setting up GH actions on the quarto website](https://quarto.org/docs/publishing/quarto-pub.html#github-action).
@@ -286,5 +306,6 @@ We're not asking GitHub to actually execute all the R code (that would be very c
 * Read about how (and why) to [version control your writing](https://education.arcus.chop.edu/version-control-writing/).
 * Get started with [Quarto slide decks](https://quarto.org/docs/presentations/).
 * Get started with [GitHub Actions](https://docs.github.com/en/actions/quickstart).
+* I kept talking about "YAML" and never explained -- [what is YAML?](https://www.redhat.com/en/topics/automation/what-is-yaml)
 * New to version control? Check out the Arcus Education [intro to version control](https://liascript.github.io/course/?https://raw.githubusercontent.com/arcus/Arcus_Labs_Orientation/main/new_to_version_control.md#1), written with biomedical researchers and clinicians in mind.
 
