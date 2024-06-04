@@ -308,13 +308,16 @@ In order for this to work, you need to [create a Quarto Pub personal access toke
 1. Log in to your **Quarto Pub** account profile page, and click "New Token". Copy it.
 2. In your **GitHub** repo, go to Settings > Secrets > Actions and click "New repository secret". Name it `QUARTO_PUB_AUTH_TOKEN` and paste in the token you copied.  
 
+## That's it! {{< fa rocket >}}
+
+Once you have those pieces in place, whenever you update your .qmd files on the main branch of your repo, your slides on Quarto Pub will update, too. 
+
 ## {{< fa book-open >}} Keep learning
 
-* You actually didn't need to listen to this talk at all! You can just follow [the instructions for setting up GH actions on the quarto website](https://quarto.org/docs/publishing/quarto-pub.html#github-action).
+* You actually didn't need to listen to this talk at all! You can just follow [the Quarto team's instructions for setting up GH actions](https://quarto.org/docs/publishing/quarto-pub.html#github-action).
 * To see a practical example, check out the [workshop series we ran using this workflow](https://arcus.github.io/r102/), including slides and recordings for four R workshops. Then poke around the GH repo to see how it's set up!
 * Read about how (and why) to [version control your writing](https://education.arcus.chop.edu/version-control-writing/).
 * Get started with [Quarto slide decks](https://quarto.org/docs/presentations/).
 * Get started with [GitHub Actions](https://docs.github.com/en/actions/quickstart).
 * I kept talking about "YAML" and never explained -- [what is YAML?](https://www.redhat.com/en/topics/automation/what-is-yaml)
 * New to version control? Check out the Arcus Education [intro to version control](https://liascript.github.io/course/?https://raw.githubusercontent.com/arcus/Arcus_Labs_Orientation/main/new_to_version_control.md#1), written with biomedical researchers and clinicians in mind.
-
