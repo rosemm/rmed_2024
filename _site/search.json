@@ -1,0 +1,93 @@
+[
+  {
+    "objectID": "quarto_and_ghactions.html#what-were-covering-today",
+    "href": "quarto_and_ghactions.html#what-were-covering-today",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "What we’re covering today",
+    "text": "What we’re covering today\n\n\nVery brief intro to Quarto\nSlightly longer intro to GitHub Actions\nWalk through an example of how to set up a repository to publish slides automatically!\nSome resources for you to explore on your own\nNOT covering how to create a GitHub repository or how to use git\n\n\n\nThis is a brief talk, so I’m going to skip past a lot of the basics in the interest of time. In particular, I’m going to assume you already use git for version control, and are familiar with terms like “commit”, “push”, and “branch” as they relate to git and GitHub. If you’re new to git, GitHub, or both, this talk probably won’t make a ton of sense for you today, but keep an eye out for the resources at the end and you can bookmark these slides to come back to at a later date. And welcome to the wonderful world of git."
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#quarto-example",
+    "href": "quarto_and_ghactions.html#quarto-example",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "Quarto example",
+    "text": "Quarto example\n\nlibrary(tidyverse)\nmsleep &lt;- msleep |&gt;\n  mutate(across(\n    where(is.character), \n    as.factor))\n\n\nThe quarto format provides a lot of great functionality for including code in your presentations, such as line highlighting!"
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#under-the-hood",
+    "href": "quarto_and_ghactions.html#under-the-hood",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "Under the hood…",
+    "text": "Under the hood…\n## Quarto example\n\n```{r}\n#| message: false\n#| code-line-numbers: \"|4|5|\"\nlibrary(tidyverse)\nmsleep &lt;- msleep |&gt;\n  mutate(across(\n    where(is.character), \n    as.factor))\n```\n\n::: notes\n\nThe quarto format provides a lot of great functionality for including \ncode in your presentations, such as line highlighting! \n\n:::\n\nAnd here’s what that slide we just saw looks like in the raw quarto file. You can see there’s a header, “Quarto example”, which gives the title of this slide. And then I have a block of R code, which runs when I render this presentation; this particular block doesn’t produce any output, it just changes the msleep dataframe. There are some options I’ve specified for the code block, special comments starting with #|. The first tells it to suppress messages, so I don’t have the message info from loading the tidyverse printed on my slides; this is just like adding “message=FALSE” to a code block in RMarkdown. The second, code-line-numbers, is quarto-specific. It’s saying I’d like to highlight different lines in the code block sequentially, so I can draw my audience’s attention to specific parts of my code. It starts with all lines, then just line 4, then just line 5, then all lines again. And under the code block, you can see there’s a little section marked “notes” – that creates the speaker notes for my slides, what I’m reading right now! Notes only show up if you opt to look at a presentation in speaker view."
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#basic-workflow-to-create-and-publish-quarto-slides",
+    "href": "quarto_and_ghactions.html#basic-workflow-to-create-and-publish-quarto-slides",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "Basic workflow to create and publish Quarto slides",
+    "text": "Basic workflow to create and publish Quarto slides\n\nMake changes to your .qmd file(s), previewing with the Render button in RStudio as you work.\nWhen you’re ready to publish, run quarto render in the command line (not R console) to convert your .qmd file(s) into the final format.\nRun quarto publish in the command line (not R console) to put your slides on QuartoPub, or wherever else you want to publish them.\n\n\nNote that this doesn’t mention git or GitHub. This is just the instructions to render and publish quarto slide decks. But you probably do also want to version control your work, and you probably do also want to share your .qmd files, in case someone else might want to adapt them. So chances are, you have a git and GitHub workflow you need to do in addition to this quarto workflow. The beauty of GitHub actions is that you can get half of this work done for you automatically!"
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#fa-book-open-learn-about-github-actions",
+    "href": "quarto_and_ghactions.html#fa-book-open-learn-about-github-actions",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": " Learn about GitHub Actions",
+    "text": "Learn about GitHub Actions\nRead the GitHub Actions Quickstart Guide and the post on the Tidyverse blog about GitHub Actions for R Users.\nFor a dive off the deep end, watch this talk about how data scientists can leverage GH Actions in a machine learning analysis workflow: Machine learning operations with GitHub Actions and Kubernetes\n\nThese are some links for you to come back to later if you want to learn more about GitHub Actions."
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#anatomy-of-a-gh-action",
+    "href": "quarto_and_ghactions.html#anatomy-of-a-gh-action",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "Anatomy of a GH Action",
+    "text": "Anatomy of a GH Action\nA YAML file saved in .github/workflows\non:\n  [Whatever event you want to be the trigger]\n  \nname: [What is this action called?]\n\njobs: \n  [What should be done? This includes both the \"steps\" and the \"runner\" -- the virtual machine the steps should be run on.]\n\n\nThe directory .github/workflows is special, and any YAML files you save in there GH will try to use as actions. The basic structure of a GH Action YAML file is to specify the trigger, which might be something like “whenever a new issue is created” or “whenever someone attempts to merge a branch into main” or even “every Tuesday morning at 6am”, the name of the action, and then the jobs that should happen on that trigger – this could be one thing, but it’s often several steps. And there are lots and lots of example workflows ready to use, so you don’t have to write code from scratch to execute most things here! You can just say “do the workflow specified in this other public repo over here but on my files”."
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#a-github-action-to-publish-to-quartopub",
+    "href": "quarto_and_ghactions.html#a-github-action-to-publish-to-quartopub",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "A GitHub Action to publish to QuartoPub",
+    "text": "A GitHub Action to publish to QuartoPub\non:\n  workflow_dispatch:\n  push:\n    branches: main\n\nname: Quarto Publish\n\njobs:\n  build-deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Check out repository\n        uses: actions/checkout@v4 \n\n      - name: Set up Quarto\n        uses: quarto-dev/quarto-actions/setup@v2\n\n      - name: Render and Publish \n        uses: quarto-dev/quarto-actions/publish@v2\n        with:\n          target: quarto-pub\n          QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}\n\nHere’s a look at what my GH Action YAML looks like for this repository. The name of this action is Quarto Publish, and it’s triggered whenever any contributor pushes changes to main, or it can be triggered manually (that’s what workflow_dispatch means). Under jobs, you can see there are three distinct steps, and for each of them I’m just referencing an existing GH Action somewhere else. The first step is “Check out repository” which just gets a copy of the files in the repository ready to work with on the runner. The second step is “Set up Quarto” which installs quarto on the runner. The third step is “Render and Publish” which publishes my slides to quarto-pub (the target) using my quarto pub authorization token, which has to be stored in secrets for this job to be able to run. Under each job, the “uses” field points to the example workflow I’m using for each – the first is just from the general GitHub examples, and the second two are published by the Quarto development team."
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#the-workflow",
+    "href": "quarto_and_ghactions.html#the-workflow",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "The workflow",
+    "text": "The workflow\n\nMake changes to your .qmd file(s), previewing with the Render button in RStudio as you work.\nWhen you’re ready to commit, run quarto render in the command line (not R console) – this ensures your instructions saved in _quarto.yml will be used.\nIf you do want those changes published, commit to main. If you don’t want them published, commit to a branch.\nAs soon as you push changes to main in your GH repo, it triggers the quarto publish action!\n\n\nYour slides will always reflect the current version of your files on main – there’s no risk of you making updates but forgetting to publish them to quartopub.\nNote that this is especially handy for repos with multiple collaborators. If you’re working on slide decks with someone who is new to quarto and/or doesn’t have their own quartopub account set up, you can set it all up once for the whole team and no one has to think about it ever again."
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#the-setup",
+    "href": "quarto_and_ghactions.html#the-setup",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "The setup",
+    "text": "The setup\nIn your directory, you will want:\n\n_quarto.yml\n_publish.yml\n_freeze\n.github/workflows\n\n\nSo, if you want your repo to work like that, what do you need to do?"
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#quarto.yml",
+    "href": "quarto_and_ghactions.html#quarto.yml",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "_quarto.yml",
+    "text": "_quarto.yml\nThis file sets options for what happens when you render.\n\nHere’s what the _quarto.yml file for this repo looks like:\nproject:\n  type: website\n  render: \n    - \"*.qmd\"\n  \nembed-resources: true\nexecute:\n  echo: true\n  freeze: auto\nformat: \n  chopr-revealjs"
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#publish.yml",
+    "href": "quarto_and_ghactions.html#publish.yml",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "_publish.yml",
+    "text": "_publish.yml\nThis file contains the information needed to publish your slides to QuartoPub (except authentication, which has to be set up separately). You don’t create this file, it will be created automatically the first time you run quarto publish locally.\n\nHere’s what _publish.yml looks like in this repo:\nput in yml"
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#freeze",
+    "href": "quarto_and_ghactions.html#freeze",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": "_freeze",
+    "text": "_freeze\nYou don’t create this directory – quarto will make it for you the first time you render your slides.\n\nWe have freeze computations set up in _quarto.yml. This means computations in R are done locally only, and the results are stored in _freeze.\nThat folder needs to be version controlled so it’s available on GitHub. When you render, it will save the results of all the executed code in the _freeze directory. When you commit and push the changes you made to your .qmd file, be sure to add any changes to the _freeze directory as well.\n\nWe’re not asking GitHub to actually execute all the R code (that would be very computationally expensive), so it’s important that you use quarto render locally on your own computer after making any changes that could affect code output."
+  },
+  {
+    "objectID": "quarto_and_ghactions.html#fa-book-open-keep-learning",
+    "href": "quarto_and_ghactions.html#fa-book-open-keep-learning",
+    "title": "Automatically Publish Quarto Slides with GitHub Actions",
+    "section": " Keep learning",
+    "text": "Keep learning\n\nYou actually didn’t need to listen to this talk at all! You can just follow the instructions for setting up GH actions on the quarto website.\nTo see a practical example, check out the workshop series we ran using this workflow, including slides and recordings for four R workshops. Then poke around the GH repo to see how it’s set up!\nRead about how (and why) to version control your writing.\nGet started with Quarto slide decks.\nGet started with GitHub Actions.\nNew to version control? Check out the Arcus Education intro to version control, written with biomedical researchers and clinicians in mind."
+  }
+]
